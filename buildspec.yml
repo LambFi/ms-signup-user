@@ -1,0 +1,32 @@
+version: 0.2
+
+phases: 
+  install: 
+    commands: 
+      - echo Installing dependencies...
+      - npm install 
+      - apt-get update
+      - apt-get install -y awscli
+
+    finally: 
+      - echo Dependencies installed.
+
+  pre_build:
+    commands:
+      - echo Entered the pre_build phase...
+
+  build:
+    commands:
+      - echo Entered the build phase...
+      - echo Build started on `date`
+      - zip -r signup-user.zip . -x "*.git/*"
+
+  post_build:
+    commands: 
+      - echo Moving files...
+      - aws lambda update-function-code --function-name signup-user --zip-file fileb://signup-user.zip
+
+artifacts: 
+  files: 
+    - signup-user.zip
+  base-directory: .
